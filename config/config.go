@@ -4,64 +4,42 @@ package config
 ...... xhmaozedi@gmail.com .......
 */
 import (
-	"fmt"
-	"strings"
-	"time"
-
 	"github.com/spf13/viper"
 )
 
-var AppConfig *config // global app config
+var AppConfig *Config
 
-type config struct {
-	Database Postgres
-	AWS      AwsS3Config
-}
-
-type Postgres struct {
-	Host         string        `mapstructure:"host"`          // postgres host
-	Port         string        `mapstructure:"port"`          // postgres port
-	User         string        `mapstructure:"user"`          // postgres user
-	Pass         string        `mapstructure:"pass"`          // postgres pass
-	DatabaseName string        `mapstructure:"database_name"` // postgres database
-	SslMode      string        `mapstructure:"ssl_mode"`      // postgres ssl mode
-	Timeout      time.Duration `mapstructure:"timeout"`       // postgres timeout
-}
-
-type AwsS3Config struct {
-	Endpoint  string `mapstructure:"endpoint"`
-	Bucket    string `mapstructure:"bucket"`
-	AccessKey string `mapstructure:"access_key"`
-	SecretKey string `mapstructure:"secret_key"`
+type Config struct {
+	DB struct {
+		Host     string
+		Port     int
+		User     string
+		Password string
+		DBName   string
+		SSLMode  string
+	}
+	Server struct {
+		Port int
+	}
 }
 
 // LoadConfig loads config from file
-func LoadConfig(path string, isTest bool) {
-	if isTest {
-		viper.SetConfigName("config_test") // name of test config file (without extension)
-	} else {
-		viper.SetConfigName("config") // name of config file (without extension)
-	}
-	viper.SetConfigType("json") // REQUIRED if the config file does not have the extension in the name
-
-	if path == "" {
-		viper.AddConfigPath("./config") // path to look for the config file in
-	} else {
-		viper.SetConfigFile(path)
+func LoadConfig() (*Config, error) {
+	viper.SetConfigName("config")    // Config file name without extension
+	viper.SetConfigType("json")      // Config file format
+	viper.AddConfigPath("../config") // path to look for the config file in
+	viper.AddConfigPath("./config")  // path to look for the config file in
+	viper.AddConfigPath(".")         // path to look for the config file in
+	// Read configuration
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
 	}
 
-	replacer := strings.NewReplacer(".", "_")
-	viper.SetEnvKeyReplacer(replacer)
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("fatal error config file: %w", err))
+	// Unmarshal into Config struct
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
 	}
 
-	AppConfig = &config{}
-	if err = viper.Unmarshal(&AppConfig); err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
-	}
+	return &config, nil
 }
