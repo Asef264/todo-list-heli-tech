@@ -10,6 +10,8 @@ setup:
 	go get github.com/minio/minio-go/v7
 	go get github.com/minio/minio-go/v7/pkg/credentials
 	go get github.com/gin-gonic/gin
+	go get github.com/DATA-DOG/go-sqlmock
+	go get github.com/stretchr/testify/assert
 
 run :
 	go run cmd/main.go
