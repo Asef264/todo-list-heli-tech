@@ -38,7 +38,12 @@ git clone <repository-url>
 cd todo-list-heli-tech
 ```
 
-### 2. Run the Application
+### 2. set up the system with project requirements
+```bash
+make setup
+```
+
+### 3. Run the Application
 
 Use the Makefile to build and run the application:
 
@@ -52,20 +57,18 @@ This will:
 - Start LocalStack to mock AWS services (S3, SQS).
 - Apply database migrations automatically.
 
-### 3. API Endpoints
+### 4. API Endpoints
 
 #### A. **Task Management**
 
-- **`POST /tasks`**: Create a new task.
-- **`GET /tasks`**: Retrieve all tasks.
-- **`PUT /tasks/{id}`**: Update a specific task.
-- **`DELETE /tasks/{id}`**: Delete a specific task.
+- **`POST /todo_item`**: Create a new task.
 
 #### B. **File Upload**
 
-- **`POST /upload`**: Upload a file and associate it with a task.
+- **`POST /files`**: Upload a file.
+- **`POST /files/:file_name`**: Download a file .
 
-### 4. Configuration
+### 5. Configuration
 
 Environment variables can be configured in a `.env` file. Example:
 
@@ -78,7 +81,7 @@ S3_BUCKET_NAME=todo-files
 SQS_QUEUE_URL=http://localhost:4566/queue/todo-queue
 ```
 
-### 5. Running Tests
+### 6. Running Tests
 
 Run unit tests with:
 
@@ -86,7 +89,7 @@ Run unit tests with:
 make test
 ```
 
-### 6. Running Benchmarks
+### 7. Running Benchmarks
 
 Run performance benchmarks with:
 
