@@ -9,5 +9,13 @@
   },
   "server": {
     "port": 8080
+  },
+  "aws": {
+    "end_point": "localhost:9001",
+    "port": "9000",
+    "bucket": "helitech",
+    "access_key": "access",
+    "secret_key": "secret",
+    "tls": false
   }
 }

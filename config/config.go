@@ -21,21 +21,24 @@ type Config struct {
 	Server struct {
 		Port int
 	}
+	AWS struct {
+		Endpoint  string
+		Bucket    string
+		AccessKey string
+		SecretKey string
+	}
 }
 
-// LoadConfig loads config from file
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("config")    // Config file name without extension
-	viper.SetConfigType("json")      // Config file format
-	viper.AddConfigPath("../config") // path to look for the config file in
-	viper.AddConfigPath("./config")  // path to look for the config file in
-	viper.AddConfigPath(".")         // path to look for the config file in
-	// Read configuration
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath("../config")
+	viper.AddConfigPath("./config")
+	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
 
-	// Unmarshal into Config struct
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		return nil, err
