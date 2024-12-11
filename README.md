@@ -117,7 +117,8 @@ make benchmark
 
 - **Go**: The main programming language.
 - **PostgreSQL**: Relational database for storing tasks.
-- **S3-Compatible Storage**: For file uploads.
+- **S3-Compatible Storage**: For cloud based file uploads.
+- **Minio**: For local upload and downloads.
 - **SQS-Compatible Queue**: For task notifications.
 - **Docker Compose**: For containerized development and deployment.
 - **gomock/mockery**: For mocking external services during tests.
