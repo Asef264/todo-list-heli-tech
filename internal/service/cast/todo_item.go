@@ -5,8 +5,8 @@ import (
 	"todo-list/internal/service/dto"
 )
 
-func ToTodoItemModel(in dto.CreateTodoItemRequest, id string) domain.TodoList {
-	return domain.TodoList{
+func ToTodoItemModel(in dto.CreateTodoItemRequest, id string) domain.TodoItem {
+	return domain.TodoItem{
 		ID:          id,
 		Description: in.Description,
 		DueDate:     in.DueDate,
@@ -14,7 +14,7 @@ func ToTodoItemModel(in dto.CreateTodoItemRequest, id string) domain.TodoList {
 	}
 }
 
-func ToTodoItemResponse(in domain.TodoList) dto.TodoItem {
+func ToTodoItemResponse(in domain.TodoItem) dto.TodoItem {
 	return dto.TodoItem{
 		ID:          in.ID,
 		Description: in.Description,

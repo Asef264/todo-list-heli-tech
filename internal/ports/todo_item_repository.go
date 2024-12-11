@@ -7,7 +7,7 @@ import (
 )
 
 type TodoItem interface {
-	CreateTodoItem(ctx context.Context, entity domain.TodoList) (*domain.TodoList, error)
+	CreateTodoItem(ctx context.Context, entity domain.TodoItem) (*domain.TodoItem, error)
 }
 
 type todoItem struct {
@@ -18,10 +18,13 @@ func NewTodoItem(db *sql.DB) TodoItem {
 	return &todoItem{db: db}
 }
 
-func (ti todoItem) CreateTodoItem(ctx context.Context, entity domain.TodoList) (*domain.TodoList, error) {
-	todoItem := domain.TodoList{}
-	if err := ti.db.QueryRowContext(ctx, CreateTodoItemQuery, entity.ID, entity.Description, entity.DueDate, entity.FileID).Scan(&todoItem); err != nil {
+func (ti todoItem) CreateTodoItem(ctx context.Context, entity domain.TodoItem) (*domain.TodoItem, error) {
+	todoItem := domain.TodoItem{}
+	if err := ti.db.QueryRow(CreateTodoItemQuery, entity.ID, entity.Description, entity.DueDate, entity.FileID).Scan(
+		&todoItem.ID, &todoItem.Description, &todoItem.DueDate, &todoItem.FileID, &todoItem.CreatedAt,
+	); err != nil {
 		return nil, err
 	}
+
 	return &todoItem, nil
 }

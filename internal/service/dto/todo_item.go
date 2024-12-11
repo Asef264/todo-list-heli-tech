@@ -8,7 +8,7 @@ import (
 
 type CreateTodoItemRequest struct {
 	Description string    `json:"description" validate:"required,lte=300"`
-	DueDate     time.Time `json:"due_date" validate:"required,time"`
+	DueDate     time.Time `json:"due_date" validate:"required"`
 	FileID      string    `json:"file_id" validate:"omitempty,uuid"`
 }
 

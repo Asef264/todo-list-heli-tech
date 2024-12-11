@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type TodoList struct {
+type TodoItem struct {
 	ID          string    `json:"id"`
 	Description string    `json:"description"`
 	DueDate     time.Time `json:"due_date"`
