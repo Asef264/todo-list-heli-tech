@@ -2,41 +2,145 @@
 This repository contains the solution for a test task provided by HeliTechnology as part of the application process.
 
 
-## folder structure 
-todo-service/
-├── cmd/                            # Main application entry point
-│   └── todo-service/               # Main application entry point folder
-│       └── main.go                 # Start the application
-├── internal/                       # Core business logic (Hexagonal Architecture)
-│   ├── app/                        # Application layer: business logic (use cases)
-│   ├── domain/                     # Core domain entities and models
-│   ├── ports/                      # Interfaces (ports) for external systems
-│   └── adapters/                   # Adapters that implement the ports (infrastructure)
-├── api/                            # HTTP handlers, routers, and validation
-│   ├── handler/                    # Handlers for API routes
-│   ├── router/                     # API routing setup
-│   └── validator/                  # Request validation logic
-├── config/                         # Configuration settings (env vars, constants)
-├── migrations/                     # Database migrations
-├── test/                           # Unit and integration tests (new section)
-│   ├── app/                        # Tests for the application layer
-│   │   ├── create_todo_test.go     # Test for creating TodoItems
-│   │   └── todo_service_test.go    # Test for service layer logic (TodoItem management)
-│   ├── domain/                     # Tests for domain models
-│   │   └── todo_item_test.go       # Unit tests for the TodoItem entity
-│   ├── adapters/                   # Tests for adapters (mocking S3, SQS)
-│   │   ├── s3_adapter_test.go      # Mock S3 test
-│   │   └── sqs_adapter_test.go     # Mock SQS test
-│   ├── api/                        # Tests for API endpoints
-│   │   ├── todo_handler_test.go    # Tests for /todo and other API routes
-│   │   └── file_handler_test.go    # Tests for file upload handling
-│   └── integration/                # Integration tests (end-to-end)
-│       ├── todo_service_integration_test.go  # Test full end-to-end functionality
-│       └── s3_sqs_integration_test.go        # Test integration with S3 and SQS
-├── docs/                           # API docs (Swagger/OpenAPI, etc.)
-├── scripts/                        # Helper scripts (e.g., for testing or migration)
-├── go.mod                          # Go module definition
-├── go.sum                          # Go checksum
-├── Makefile                        # Makefile for building, testing, running
-├── README.md                       # Project documentation
-└── docker-compose.yml              # Docker Compose configuration
+# Todo Service
+
+## Description
+This project implements a **Todo Service** that allows users to manage `TodoItem` entities with the following key features:
+
+1. **File Upload**: Upload files to an S3 bucket and store their references.
+2. **TodoItem Management**: Create, store, and manage `TodoItem` entities with PostgreSQL.
+3. **SQS Queue Integration**: Send `TodoItem` data to an SQS queue.
+4. **Hexagonal Architecture**: Clean separation of concerns with ports and adapters.
+5. **Dockerized Environment**: Easily deployable using Docker Compose.
+6. **Unit Testing & Benchmarking**: Fully tested with mocks for external services.
+
+## Prerequisites
+
+Ensure you have the following installed:
+
+- **Docker**
+- **Docker Compose**
+- **Make**
+- **Go (1.23 or newer)**
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
+
+### 2. Build and Run the Project
+
+Use the Makefile to start the project:
+
+```bash
+make run
+```
+
+This command will:
+
+- Start the PostgreSQL database.
+- Start LocalStack to mock AWS S3 and SQS.
+- Apply database migrations automatically.
+
+### 3. Endpoints
+
+#### A. **File Upload**
+
+- **Endpoint**: `POST /upload`
+- **Description**: Allows users to upload a file (e.g., text or image) to S3.
+- **Response**: Returns a `fileId` representing the file in S3.
+
+#### B. **Create TodoItem**
+
+- **Endpoint**: `POST /todo`
+- **Description**: Create a `TodoItem` with a description, due date, and optional `fileId`.
+- **Response**: Returns the created `TodoItem`.
+
+### 4. Environment Variables
+
+Configure the following environment variables in a `.env` file:
+
+```env
+DATABASE_URL=postgres://user:password@localhost:5432/todo
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=todo-files
+SQS_QUEUE_URL=http://localhost:4566/queue/todo-queue
+```
+
+### 5. Running Tests
+
+Run unit tests using the Makefile:
+
+```bash
+make test
+```
+
+This will test:
+
+- File uploads to S3.
+- Creation of `TodoItem` in PostgreSQL.
+- Sending messages to the SQS queue.
+
+### 6. Running Benchmarks
+
+Run benchmarks for critical operations:
+
+```bash
+make benchmark
+```
+
+Benchmarked operations include:
+
+- Inserting a `TodoItem` into PostgreSQL.
+- Uploading files to S3.
+- Sending messages to SQS.
+
+## Architecture
+
+This project follows the **Hexagonal Architecture**:
+
+- **Domain Logic**: Core business logic independent of infrastructure.
+- **Ports**: Interfaces for interacting with the core logic (e.g., repository, SQS, S3).
+- **Adapters**: Implementations of the ports for external systems (e.g., PostgreSQL, S3, SQS).
+
+## Tools and Libraries
+
+- **PostgreSQL**: For data persistence.
+- **AWS S3**: For file storage.
+- **AWS SQS**: For message queuing.
+- **LocalStack**: To mock AWS services during development.
+- **gomock/mockery**: For generating mocks in unit tests.
+
+## Folder Structure
+
+```plaintext
+.
+├── cmd/                # Entry points for the application
+├── internal/           # Core application logic and domain
+│   ├── domain/         # Domain entities and interfaces
+│   ├── adapters/       # Infrastructure implementations (PostgreSQL, S3, SQS)
+│   ├── ports/          # Interfaces for external dependencies
+├── migrations/         # Database migration files
+├── tests/              # Unit tests and benchmarks
+├── docker-compose.yml  # Docker Compose configuration
+├── Makefile            # Automation commands
+├── .env                # Environment variables
+└── README.md           # Project documentation
+```
+
+## Expected Deliverables
+
+- **Dockerized Setup**: Includes PostgreSQL and LocalStack for mocking S3 and SQS.
+- **Database Migrations**: Creates the `TodoItem` table with `id`, `description`, `dueDate`, and `fileId` columns.
+- **Unit Tests**: Verifies file uploads, TodoItem creation, and SQS messaging.
+- **Benchmarks**: Measures performance of key operations.
+
+## License
+
+This project is intended for evaluation purposes only.
