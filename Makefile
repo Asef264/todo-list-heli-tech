@@ -15,3 +15,7 @@ setup:
 
 run :
 	go run cmd/main.go
+
+
+unit_test:
+	go test -v ./internal/ports
