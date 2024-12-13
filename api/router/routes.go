@@ -7,7 +7,7 @@ import (
 	"todo-list/api/handler"
 	"todo-list/config"
 	"todo-list/internal/adapters/persistence"
-	s3Adaptor "todo-list/internal/adapters/s3"
+	storage "todo-list/internal/adapters/storage"
 	"todo-list/internal/ports"
 	"todo-list/internal/service"
 	storage_service "todo-list/internal/service/storage"
@@ -25,8 +25,8 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB, cfg *config.Config) {
 		"./migrations/",
 		cfg.DB.DBName,
 	)
-	storageS3Client := s3Adaptor.CreateAWSS3Client("http://localhost:9000", "minioadmin", "minioadmin")
-	storageMinioClient, err := s3Adaptor.CreateMinioClient("localhost:9000", "minioadmin", "minioadmin", false)
+	storageS3Client := storage.CreateAWSS3Client("http://localhost:9000", "minioadmin", "minioadmin")
+	storageMinioClient, err := storage.CreateMinioClient("localhost:9000", "minioadmin", "minioadmin", false)
 	if err != nil {
 		log.Fatalf("Failed to create MinIO client: %v", err)
 	}
