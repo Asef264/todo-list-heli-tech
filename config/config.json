@@ -10,12 +10,18 @@
   "server": {
     "port": 8080
   },
-  "aws": {
+  "minio_config": {
     "end_point": "localhost:9001",
     "port": "9000",
     "bucket": "helitech",
-    "access_key": "access",
-    "secret_key": "secret",
+    "access_key": "minioadmin",
+    "secret_key": "minioadmin",
     "tls": false
+  },
+  "s3_config": {
+    "endpoint": "localhost:9001",
+    "bucket": "helitech",
+    "access_key": "minioadmin",
+    "secret_key": "minioadmin"
   }
 }

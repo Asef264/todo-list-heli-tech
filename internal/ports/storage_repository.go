@@ -42,7 +42,7 @@ func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string) er
 func (s *s3Storage) Download(ctx context.Context, filename string) ([]byte, error) {
 	obj, err := s.Client.GetObject(ctx,
 		&s3.GetObjectInput{
-			Bucket: aws.String(config.AppConfig.AWS.Bucket),
+			Bucket: aws.String(config.AppConfig.S3Config.Bucket),
 			Key:    aws.String(filename),
 		})
 	if err != nil {

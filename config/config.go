@@ -21,11 +21,19 @@ type Config struct {
 	Server struct {
 		Port int
 	}
-	AWS struct {
+	S3Config struct {
 		Endpoint  string
 		Bucket    string
 		AccessKey string
 		SecretKey string
+	}
+	MinioConfig struct {
+		Host      string
+		Port      string
+		Bucket    string
+		AccessKey string
+		SecretKey string
+		TLS       bool
 	}
 }
 
