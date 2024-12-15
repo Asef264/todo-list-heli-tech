@@ -3,6 +3,7 @@ package config
 /* *****Test Project for HeliTechnology Company*****
 ...... xhmaozedi@gmail.com .......
 */
+
 import (
 	"fmt"
 
@@ -37,14 +38,20 @@ type Config struct {
 		SecretKey string `mapstructure:"secret_key"`
 		TLS       bool   `mapstructure:"tls"`
 	} `mapstructure:"minio_config"`
+	SQSConfig struct {
+		QueueURL  string `mapstructure:"queue_url"`
+		Region    string `mapstructure:"region"`
+		AccessKey string `mapstructure:"access_key"`
+		SecretKey string `mapstructure:"secret_key"`
+	} `mapstructure:"sqs_config"`
 }
 
 func LoadConfig() (*Config, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	viper.AddConfigPath("../config")
-	viper.AddConfigPath("./config")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("../config") // Look in parent directory
+	viper.AddConfigPath("./config")  // Look in the current directory
+	viper.AddConfigPath(".")         // Look in the current directory
 
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf("Error reading config file: %v\n", err)

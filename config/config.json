@@ -23,5 +23,11 @@
     "bucket": "helitech",
     "access_key": "minioadmin",
     "secret_key": "minioadmin"
+  },
+  "sqs_config": {
+    "queue_url": "http://localhost:4566",
+    "region": "us-east-1",
+    "access_key": "example",
+    "secret_key": "example"
   }
 }

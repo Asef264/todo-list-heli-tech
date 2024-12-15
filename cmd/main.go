@@ -29,6 +29,7 @@ func Init() (*gin.Engine, *config.Config, *sql.DB) {
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
+	config.AppConfig = cfg
 
 	db, err := dbPkg.NewDB(cfg)
 	if err != nil {

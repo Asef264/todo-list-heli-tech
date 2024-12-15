@@ -1,0 +1,15 @@
+FROM golang:1.20-alpine
+
+WORKDIR /todo-list
+
+COPY go.mod go.sum ./
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o todo ./cmd/todo/
+
+COPY . .
+
+RUN go build -o main .
+
+EXPOSE 8080
+
+CMD ./cmd

@@ -8,11 +8,13 @@ import (
 	"todo-list/config"
 	"todo-list/internal/adapters/api/handler"
 	"todo-list/internal/adapters/repository"
+	sqsAdapters "todo-list/internal/adapters/sqs"
 	adapters "todo-list/internal/adapters/storage"
 	ports "todo-list/internal/ports/storage"
 	"todo-list/internal/service"
 	storage_service "todo-list/internal/service/storage"
 	dbPkg "todo-list/pkg/db"
+	sqsPkg "todo-list/pkg/sqs"
 	storagePkg "todo-list/pkg/storage"
 
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -27,8 +29,10 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB, cfg *config.Config) {
 		"./migrations/",
 		cfg.DB.DBName,
 	)
-	storageS3Client := storagePkg.CreateAWSS3Client("http://localhost:9000", "minioadmin", "minioadmin", "helitech")
-	storageMinioClient, err := storagePkg.CreateMinioClient("localhost:9000", "minioadmin", "minioadmin", false)
+	storageS3Client := storagePkg.CreateAWSS3Client(cfg.S3Config.Endpoint, cfg.S3Config.AccessKey, cfg.S3Config.SecretKey, cfg.S3Config.Bucket)
+	storageMinioClient, err := storagePkg.CreateMinioClient(cfg.MinioConfig.Host, cfg.MinioConfig.AccessKey, cfg.MinioConfig.SecretKey, cfg.MinioConfig.TLS)
+	sqsClient := sqsPkg.CreateNewSQSClient(cfg.SQSConfig.AccessKey, cfg.SQSConfig.SecretKey, cfg.SQSConfig.QueueURL, cfg.SQSConfig.Region)
+
 	if err != nil {
 		log.Fatalf("Failed to create MinIO client: %v", err)
 	}
@@ -38,9 +42,10 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB, cfg *config.Config) {
 	// repository
 	todoItemRepository := repository.NewTodoItem(db)
 	storageRepository := RegisterStorageRepository(storageS3Client, storageMinioClient)
+	sqsRepository := sqsAdapters.NewSQSAdapter(sqsClient)
 
 	//service
-	todoItemService := service.NewTodoItemService(todoItemRepository)
+	todoItemService := service.NewTodoItemService(todoItemRepository, sqsRepository)
 	storageService := storage_service.NewStorageService(storageRepository)
 
 	//adapter

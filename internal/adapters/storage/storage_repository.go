@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strings"
+	"todo-list/config"
 	ports "todo-list/internal/ports/storage"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -27,8 +28,6 @@ func NewS3Storage(client *s3.S3, mockClient map[string][]byte) ports.Storage {
 	}
 }
 
-var bucket string = "helitech-storage"
-
 func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string, isMock bool) error {
 	if isMock {
 		s.mockClient[filename] = file
@@ -36,7 +35,7 @@ func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string, is
 	}
 	_, err := s.client.PutObject(&s3.PutObjectInput{
 		Body:   strings.NewReader(string(file)),
-		Bucket: &bucket,
+		Bucket: &config.AppConfig.S3Config.Bucket,
 		Key:    &filename,
 	},
 	)
@@ -54,7 +53,7 @@ func (s *s3Storage) Download(ctx context.Context, filename string, isMock bool) 
 	}
 	obj, err := s.client.GetObject(
 		&s3.GetObjectInput{
-			Bucket: aws.String(bucket),
+			Bucket: aws.String(config.AppConfig.S3Config.Bucket),
 			Key:    aws.String(filename),
 		})
 	if err != nil {
@@ -88,7 +87,7 @@ func (s *minioStorage) Upload(ctx context.Context, file []byte, fileName string,
 		s.mockClient[fileName] = file
 		return nil
 	}
-	_, err := s.client.PutObject(ctx, "helitech", fileName, bytes.NewReader(file), int64(len(file)), minio.PutObjectOptions{})
+	_, err := s.client.PutObject(ctx, config.AppConfig.MinioConfig.Bucket, fileName, bytes.NewReader(file), int64(len(file)), minio.PutObjectOptions{})
 	return err
 
 }
@@ -101,7 +100,7 @@ func (s *minioStorage) Download(ctx context.Context, filename string, isMock boo
 		}
 		return res, nil
 	}
-	obj, err := s.client.GetObject(ctx, "helitech", filename, minio.GetObjectOptions{})
+	obj, err := s.client.GetObject(ctx, config.AppConfig.MinioConfig.Bucket, filename, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}
