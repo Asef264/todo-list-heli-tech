@@ -1,15 +1,25 @@
-FROM golang:1.20-alpine
+# syntax=docker/dockerfile:1
+
+FROM golang:1.23.2 as builder
 
 WORKDIR /todo-list
 
 COPY go.mod go.sum ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o todo-list ./cmd
+COPY vendor/ ./vendor
 
 COPY . .
 
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o todo-list ./cmd
 
-EXPOSE 8080
+FROM alpine:latest
 
-CMD ./cmd
+
+WORKDIR /root/
+
+COPY --from=builder /todo-list/cmd .
+COPY --from=builder /todo-list/config/ ./config/ 
+
+EXPOSE 4853
+
+CMD ./todo

@@ -21,3 +21,6 @@ unit_test:
 
 bench_mark:
 	go test -bench=. ./internal/ports
+
+docker_compose_run:
+	docker compose up
