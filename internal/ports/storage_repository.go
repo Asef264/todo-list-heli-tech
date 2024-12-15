@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"errors"
 	"io"
+	"log"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -47,7 +49,11 @@ func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string, is
 
 func (s *s3Storage) Download(ctx context.Context, filename string, isMock bool) ([]byte, error) {
 	if isMock {
-		res := s.mockClient[filename]
+		log.Println(s.mockClient)
+		res, exist := s.mockClient[filename]
+		if !exist {
+			return nil, errors.New("not found")
+		}
 		return res, nil
 	}
 	obj, err := s.client.GetObject(
@@ -93,7 +99,10 @@ func (s *minioStorage) Upload(ctx context.Context, file []byte, fileName string,
 
 func (s *minioStorage) Download(ctx context.Context, filename string, isMock bool) ([]byte, error) {
 	if isMock {
-		res := s.mockClient[filename]
+		res, exist := s.mockClient[filename]
+		if !exist {
+			return nil, errors.New("not found")
+		}
 		return res, nil
 	}
 	obj, err := s.client.GetObject(ctx, "helitech", filename, minio.GetObjectOptions{})

@@ -18,3 +18,6 @@ run :
 
 unit_test:
 	go test -v ./internal/ports
+
+bench_mark:
+	go test -bench=. ./internal/ports
