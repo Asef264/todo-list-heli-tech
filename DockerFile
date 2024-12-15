@@ -4,7 +4,7 @@ WORKDIR /todo-list
 
 COPY go.mod go.sum ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o todo ./cmd/todo/
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o todo-list ./cmd
 
 COPY . .
 

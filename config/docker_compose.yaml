@@ -28,7 +28,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - localstack-data:/var/lib/localstack/data
 
-  # Your Go application
+
   app:
     build: .
     container_name: todo-app
