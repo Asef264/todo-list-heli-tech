@@ -4,20 +4,17 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	ports "todo-list/internal/ports/api"
 	storage_service "todo-list/internal/service/storage"
 
 	"github.com/gin-gonic/gin"
 )
 
-type StorageController interface {
-	Upload(ctx *gin.Context)
-	Download(ctx *gin.Context)
-}
 type storageController struct {
 	storageService storage_service.StorageService
 }
 
-func NewStorageController(storageService storage_service.StorageService) StorageController {
+func NewStorageController(storageService storage_service.StorageService) ports.StorageController {
 	return &storageController{
 		storageService: storageService,
 	}

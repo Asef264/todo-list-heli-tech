@@ -3,21 +3,18 @@ package handler
 import (
 	"log"
 	"net/http"
+	ports "todo-list/internal/ports/api"
 	"todo-list/internal/service"
 	"todo-list/internal/service/dto"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TodoItemHandler interface {
-	Create(c *gin.Context)
-}
-
 type todoItem struct {
 	todoItemService service.TodoItemService
 }
 
-func NewTodoItemHandler(tis service.TodoItemService) TodoItemHandler {
+func NewTodoItemHandler(tis service.TodoItemService) ports.TodoItemHandler {
 	return &todoItem{
 		todoItemService: tis,
 	}

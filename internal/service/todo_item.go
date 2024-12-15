@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"todo-list/internal/ports"
+
+	ports "todo-list/internal/ports/repository"
 	"todo-list/internal/service/cast"
 	"todo-list/internal/service/dto"
 	"todo-list/pkg/validator"

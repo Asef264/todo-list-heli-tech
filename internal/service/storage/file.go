@@ -2,7 +2,7 @@ package storage_service
 
 import (
 	"context"
-	"todo-list/internal/ports"
+	ports "todo-list/internal/ports/storage"
 )
 
 type StorageService interface {

@@ -1,4 +1,4 @@
-package ports
+package adapters
 
 import (
 	"bytes"
@@ -8,23 +8,19 @@ import (
 	"io"
 	"log"
 	"strings"
+	ports "todo-list/internal/ports/storage"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/minio/minio-go/v7"
 )
 
-type Storage interface {
-	Upload(ctx context.Context, file []byte, filename string, isMock bool) error
-	Download(ctx context.Context, filename string, isMock bool) ([]byte, error)
-}
-
 type s3Storage struct {
 	client     *s3.S3
 	mockClient map[string][]byte
 }
 
-func NewS3Storage(client *s3.S3, mockClient map[string][]byte) Storage {
+func NewS3Storage(client *s3.S3, mockClient map[string][]byte) ports.Storage {
 	return &s3Storage{
 		client:     client,
 		mockClient: make(map[string][]byte),
@@ -80,7 +76,7 @@ type minioStorage struct {
 	mockClient map[string][]byte
 }
 
-func NewMinioStorage(client *minio.Client, mockClient map[string][]byte) Storage {
+func NewMinioStorage(client *minio.Client, mockClient map[string][]byte) ports.Storage {
 	return &minioStorage{
 		client:     client,
 		mockClient: make(map[string][]byte),

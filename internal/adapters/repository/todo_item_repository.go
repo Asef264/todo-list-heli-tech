@@ -1,20 +1,17 @@
-package ports
+package repository
 
 import (
 	"context"
 	"database/sql"
 	"todo-list/internal/domain"
+	ports "todo-list/internal/ports/repository"
 )
-
-type TodoItem interface {
-	CreateTodoItem(ctx context.Context, entity domain.TodoItem) (*domain.TodoItem, error)
-}
 
 type todoItem struct {
 	db *sql.DB
 }
 
-func NewTodoItem(db *sql.DB) TodoItem {
+func NewTodoItem(db *sql.DB) ports.TodoItem {
 	return &todoItem{db: db}
 }
 

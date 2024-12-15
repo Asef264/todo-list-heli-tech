@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"todo-list/api/router"
+
 	"todo-list/config"
-	"todo-list/internal/adapters/persistence"
+	"todo-list/internal/adapters/api/router"
+	dbPkg "todo-list/pkg/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,13 +30,13 @@ func Init() (*gin.Engine, *config.Config, *sql.DB) {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
-	db, err := persistence.NewDB(cfg)
+	db, err := dbPkg.NewDB(cfg)
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 	log.Println("Database connection established successfully!")
 
-	persistence.MigrateUp(db, "migrations", cfg.DB.DBName)
+	dbPkg.MigrateUp(db, "migrations", cfg.DB.DBName)
 
 	app := gin.Default()
 
