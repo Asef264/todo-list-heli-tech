@@ -11,7 +11,7 @@
     "port": 8080
   },
   "minio_config": {
-    "end_point": "localhost:9001",
+    "end_point": "localhost",
     "port": "9000",
     "bucket": "helitech",
     "access_key": "minioadmin",

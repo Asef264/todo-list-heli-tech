@@ -6,8 +6,8 @@ import (
 )
 
 type StorageService interface {
-	Upload(ctx context.Context, file []byte, filename string) error
-	Download(ctx context.Context, filename string) ([]byte, error)
+	Upload(ctx context.Context, file []byte, filename string, isMock bool) error
+	Download(ctx context.Context, filename string, isMock bool) ([]byte, error)
 }
 
 type storageService struct {
@@ -20,10 +20,10 @@ func NewStorageService(s ports.Storage) StorageService {
 	}
 }
 
-func (u *storageService) Upload(ctx context.Context, file []byte, filename string) error {
-	return u.storageRepository.Upload(ctx, file, filename)
+func (u *storageService) Upload(ctx context.Context, file []byte, filename string, isMock bool) error {
+	return u.storageRepository.Upload(ctx, file, filename, isMock)
 }
 
-func (u *storageService) Download(ctx context.Context, filename string) ([]byte, error) {
-	return u.storageRepository.Download(ctx, filename)
+func (u *storageService) Download(ctx context.Context, filename string, isMock bool) ([]byte, error) {
+	return u.storageRepository.Download(ctx, filename, isMock)
 }

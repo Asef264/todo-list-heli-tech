@@ -3,6 +3,7 @@ package handler
 import (
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	storage_service "todo-list/internal/service/storage"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,13 @@ func NewStorageController(storageService storage_service.StorageService) Storage
 }
 
 func (sc storageController) Upload(c *gin.Context) {
+	flag := c.Query("is_mock")
+	isMock, err := strconv.ParseBool(flag)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid boolean value for 'flag'"})
+		return
+	}
+
 	file, _ := c.FormFile("file")
 	src, err := file.Open()
 	if err != nil {
@@ -35,7 +43,7 @@ func (sc storageController) Upload(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "error on converting, system error"})
 	}
-	err = sc.storageService.Upload(c.Request.Context(), data, file.Filename)
+	err = sc.storageService.Upload(c.Request.Context(), data, file.Filename, isMock)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to upload file"})
 		return
@@ -47,8 +55,14 @@ func (sc storageController) Upload(c *gin.Context) {
 }
 
 func (sc storageController) Download(c *gin.Context) {
+	flag := c.Query("is_mock")
+	isMock, err := strconv.ParseBool(flag)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid boolean value for 'flag'"})
+		return
+	}
 	fileName := c.Param("file_name")
-	object, err := sc.storageService.Download(c.Request.Context(), fileName)
+	object, err := sc.storageService.Download(c.Request.Context(), fileName, isMock)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return

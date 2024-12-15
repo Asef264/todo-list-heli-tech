@@ -21,7 +21,7 @@ func main() {
 }
 
 func Init() (*gin.Engine, *config.Config, *sql.DB) {
-	if err := os.Setenv("STORAGE_TYPE", "minio"); err != nil {
+	if err := os.Setenv("STORAGE_TYPE", "s3"); err != nil {
 		log.Fatalf("error on set storage type,%e", err)
 	}
 	cfg, err := config.LoadConfig()

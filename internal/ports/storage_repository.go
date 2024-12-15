@@ -5,75 +5,97 @@ import (
 	"context"
 	"encoding/base64"
 	"io"
-	"io/ioutil"
-	"todo-list/config"
+	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/minio/minio-go/v7"
 )
 
 type Storage interface {
-	Upload(ctx context.Context, file []byte, filename string) error
-	Download(ctx context.Context, filename string) ([]byte, error)
+	Upload(ctx context.Context, file []byte, filename string, isMock bool) error
+	Download(ctx context.Context, filename string, isMock bool) ([]byte, error)
 }
 
 type s3Storage struct {
-	Client *s3.Client
+	client     *s3.S3
+	mockClient map[string][]byte
 }
 
-func NewS3Storage(client *s3.Client) Storage {
+func NewS3Storage(client *s3.S3, mockClient map[string][]byte) Storage {
 	return &s3Storage{
-		Client: client,
+		client:     client,
+		mockClient: make(map[string][]byte),
 	}
 }
 
-func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string) error {
-	_, err := s.Client.PutObject(ctx,
-		&s3.PutObjectInput{
-			Bucket: aws.String("helitech"),
-			Key:    aws.String(filename),
-			Body:   bytes.NewReader(file),
-		},
+var bucket string = "helitech-storage"
+
+func (s *s3Storage) Upload(ctx context.Context, file []byte, filename string, isMock bool) error {
+	if isMock {
+		s.mockClient[filename] = file
+		return nil
+	}
+	_, err := s.client.PutObject(&s3.PutObjectInput{
+		Body:   strings.NewReader(string(file)),
+		Bucket: &bucket,
+		Key:    &filename,
+	},
 	)
 	return err
 }
 
-func (s *s3Storage) Download(ctx context.Context, filename string) ([]byte, error) {
-	obj, err := s.Client.GetObject(ctx,
+func (s *s3Storage) Download(ctx context.Context, filename string, isMock bool) ([]byte, error) {
+	if isMock {
+		res := s.mockClient[filename]
+		return res, nil
+	}
+	obj, err := s.client.GetObject(
 		&s3.GetObjectInput{
-			Bucket: aws.String(config.AppConfig.S3Config.Bucket),
+			Bucket: aws.String(bucket),
 			Key:    aws.String(filename),
 		})
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := ioutil.ReadAll(obj.Body)
+	data, err := io.ReadAll(obj.Body)
 	if err != nil {
 		return nil, err
 	}
+
 	base64Content := base64.StdEncoding.EncodeToString(data)
+
 	return []byte(base64Content), nil
 }
 
 type minioStorage struct {
-	client *minio.Client
+	client     *minio.Client
+	mockClient map[string][]byte
 }
 
-func NewMinioStorage(client *minio.Client) Storage {
+func NewMinioStorage(client *minio.Client, mockClient map[string][]byte) Storage {
 	return &minioStorage{
-		client: client,
+		client:     client,
+		mockClient: make(map[string][]byte),
 	}
 }
 
-func (s *minioStorage) Upload(ctx context.Context, file []byte, fileName string) error {
+func (s *minioStorage) Upload(ctx context.Context, file []byte, fileName string, isMock bool) error {
+	if isMock {
+		s.mockClient[fileName] = file
+		return nil
+	}
 	_, err := s.client.PutObject(ctx, "helitech", fileName, bytes.NewReader(file), int64(len(file)), minio.PutObjectOptions{})
 	return err
 
 }
 
-func (s *minioStorage) Download(ctx context.Context, filename string) ([]byte, error) {
+func (s *minioStorage) Download(ctx context.Context, filename string, isMock bool) ([]byte, error) {
+	if isMock {
+		res := s.mockClient[filename]
+		return res, nil
+	}
 	obj, err := s.client.GetObject(ctx, "helitech", filename, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err

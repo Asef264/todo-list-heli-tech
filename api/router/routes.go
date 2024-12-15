@@ -12,8 +12,7 @@ import (
 	"todo-list/internal/service"
 	storage_service "todo-list/internal/service/storage"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 )
@@ -25,7 +24,7 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB, cfg *config.Config) {
 		"./migrations/",
 		cfg.DB.DBName,
 	)
-	storageS3Client := storage.CreateAWSS3Client("http://localhost:9000", "minioadmin", "minioadmin")
+	storageS3Client := storage.CreateAWSS3Client("http://localhost:9000", "minioadmin", "minioadmin", "helitech")
 	storageMinioClient, err := storage.CreateMinioClient("localhost:9000", "minioadmin", "minioadmin", false)
 	if err != nil {
 		log.Fatalf("Failed to create MinIO client: %v", err)
@@ -52,15 +51,16 @@ func RegisterRoutes(router *gin.Engine, db *sql.DB, cfg *config.Config) {
 	router.GET("/files/:file_name", storageController.Download)
 }
 
-func RegisterStorageRepository(s3Client *s3.Client, minioClient *minio.Client) ports.Storage {
+func RegisterStorageRepository(s3Client *s3.S3, minioClient *minio.Client) ports.Storage {
+	mockClient := make(map[string][]byte)
 	storageType := os.Getenv("STORAGE_TYPE")
 	switch storageType {
 	case "minio":
-		return ports.NewMinioStorage(minioClient)
-	case "aws":
-		return ports.NewS3Storage(s3Client)
+		return ports.NewMinioStorage(minioClient, mockClient)
+	case "s3":
+		return ports.NewS3Storage(s3Client, mockClient)
 	default:
-		return ports.NewMinioStorage(minioClient)
+		return ports.NewMinioStorage(minioClient, mockClient)
 
 	}
 }
